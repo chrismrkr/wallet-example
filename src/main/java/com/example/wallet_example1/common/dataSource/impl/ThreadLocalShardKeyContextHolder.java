@@ -18,4 +18,7 @@ public class ThreadLocalShardKeyContextHolder {
         Assert.notNull(key, "KEY cannot be null");
         CONTEXT.set(key);
     }
+    public static void clear() {
+        CONTEXT.remove();
+    }
 }

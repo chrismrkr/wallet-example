@@ -1,5 +1,6 @@
 package com.example.wallet_example1.member.service;
 
+import com.example.wallet_example1.common.dataSource.impl.ThreadLocalShardKeyContextHolder;
 import com.example.wallet_example1.member.infrastructure.MemberJpaRepository;
 import com.example.wallet_example1.member.infrastructure.entity.MemberEntity;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,13 @@ public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
 
     public String createMember(Long userId, String name) {
+        ThreadLocalShardKeyContextHolder.setKey(userId);
         MemberEntity build = MemberEntity.builder()
                 .memberId(userId)
                 .name(name)
                 .build();
         memberJpaRepository.save(build);
+        ThreadLocalShardKeyContextHolder.clear();
         return "ok";
     }
 }
