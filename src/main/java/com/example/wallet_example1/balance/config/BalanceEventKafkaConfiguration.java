@@ -1,7 +1,7 @@
 package com.example.wallet_example1.balance.config;
 
 import com.example.wallet_example1.balance.domain.BalanceEvent;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -9,10 +9,12 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -41,7 +43,15 @@ public class BalanceEventKafkaConfiguration {
         );
     }
 
-    @Bean(name = "balanceEventConsumerFactory")
+    @Bean(name = "concurrentBalanceEventConsumerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, BalanceEvent> concurrentBalanceEventConsumerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, BalanceEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(balanceEventConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        return factory;
+    }
+
+    @Bean
     public DefaultKafkaConsumerFactory<String, BalanceEvent> balanceEventConsumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, env.getProperty("spring.kafka.bootstrap-servers"));
@@ -61,5 +71,21 @@ public class BalanceEventKafkaConfiguration {
         JsonDeserializer<BalanceEvent> jsonDeserializer = new JsonDeserializer<>(BalanceEvent.class);
         jsonDeserializer.addTrustedPackages("*");
         return jsonDeserializer;
+    }
+
+    @Bean(name = "balanceEventStreamInfo")
+    public ConsumerTopicGroupInfo balanceEventStreamInfo() {
+        String topicName = env.getProperty("spring.kafka.topic.balance.topic-name");
+        String groupId = env.getProperty("spring.kafka.topic.balance.group-id");
+        return new ConsumerTopicGroupInfo(topicName, groupId);
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConsumerTopicGroupInfo {
+        private String topicName;
+        private String groupId;
     }
 }
