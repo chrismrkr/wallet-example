@@ -4,5 +4,6 @@ import com.example.wallet_example1.balance.domain.BalanceEvent;
 
 public interface BalanceService {
     void publishBalanceEvent(BalanceEvent balanceEvent);
-    void subscribeBalanceEvent(BalanceEvent balanceEvent);
+
+    void initializeBalance(Long memberId, Long balanceId, String amount);
 }

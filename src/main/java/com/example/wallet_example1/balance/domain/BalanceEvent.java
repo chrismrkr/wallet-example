@@ -10,14 +10,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BalanceEvent {
     private Long eventId;
-    private String balanceId;
+    private String senderBalanceId;
+    private String receiverBalanceId;
     private BalanceOperation balanceOperation;
     private String amount;
+
+    private Long senderId;
+    private Long receiverId;
     @Builder
-    private BalanceEvent(Long eventId, String balanceId, BalanceOperation balanceOperation, String amount) {
+    private BalanceEvent(Long eventId, String senderBalanceId, String receiverBalanceId, BalanceOperation balanceOperation, String amount,
+                        Long senderId, Long receiverId) {
         this.eventId = eventId;
-        this.balanceId = balanceId;
+        this.senderBalanceId = senderBalanceId;
+        this.receiverBalanceId = receiverBalanceId;
         this.balanceOperation = balanceOperation;
         this.amount = amount;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
     }
 }

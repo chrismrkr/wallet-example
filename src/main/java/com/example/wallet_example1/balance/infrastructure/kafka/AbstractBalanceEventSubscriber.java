@@ -15,10 +15,14 @@ public abstract class AbstractBalanceEventSubscriber implements BalanceEventSubs
             containerFactory = "concurrentBalanceEventConsumerFactory"
     )
     public void subscribeEvent(ConsumerRecord<String, BalanceEvent> record, Acknowledgment ack) {
-        BalanceEvent event = record.value();
-        this.doTransaction(event);
-        ack.acknowledge();
-        this.doNextTransaction(event);
+        try {
+            BalanceEvent event = record.value();
+            this.doTransaction(event);
+            ack.acknowledge();
+            this.doNextTransaction(event);
+        } catch (Exception e) {
+            throw e;
+        }
     }
     protected void doTransaction(BalanceEvent balanceEvent) {}
     protected void doNextTransaction(BalanceEvent balanceEvent) {}
