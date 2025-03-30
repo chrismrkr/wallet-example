@@ -21,8 +21,12 @@ public class DefaultBalanceEventSubscriber extends AbstractBalanceEventSubscribe
     public void doTransaction(BalanceEvent balanceEvent) {
         log.info("do Transaction");
         switch (balanceEvent.getBalanceOperation()) {
-            case SUBTRACT -> balanceDecreaseEventHandler.handle(balanceEvent);
-            case ADD -> balanceIncreaseEventHandler.handle(balanceEvent);
+            case SUBTRACT -> {
+                balanceDecreaseEventHandler.handle(balanceEvent);
+            }
+            case ADD -> {
+                balanceIncreaseEventHandler.handle(balanceEvent);
+            }
             default -> throw new IllegalArgumentException("Not Supported Balance");
         }
     }

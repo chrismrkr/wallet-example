@@ -43,7 +43,7 @@ public class BalanceTest {
                 .balanceId("110352111111")
                 .amount("10000")
                 .build();
-        // when then
+        // when, then
         Assertions.assertThrows(IllegalArgumentException.class , () -> balance.subtractAmount("300000"));
 
     }

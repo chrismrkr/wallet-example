@@ -2,6 +2,7 @@ package com.example.wallet_example1.balance.domain;
 
 import com.example.wallet_example1.balance.domain.enums.BalanceEventStatus;
 import com.example.wallet_example1.balance.domain.enums.BalanceOperation;
+import com.example.wallet_example1.balance.infrastructure.entity.BalanceEventOutboxEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +27,25 @@ public class BalanceEventOutbox {
         this.receiverId = receiverId;
         this.amount = amount;
         this.status = status;
+    }
+
+    public static BalanceEventOutbox from(BalanceEventOutboxEntity entity) {
+        return BalanceEventOutbox.builder()
+                .eventId(entity.getEventId())
+                .senderId(entity.getSenderId())
+                .receiverId(entity.getReceiverId())
+                .amount(entity.getAmount())
+                .status(entity.getStatus())
+                .build();
+    }
+
+    public BalanceEventOutboxEntity toEntity() {
+        return BalanceEventOutboxEntity.builder()
+                .eventId(this.getEventId())
+                .senderId(this.getSenderId())
+                .receiverId(this.getReceiverId())
+                .amount(this.getAmount())
+                .status(this.getStatus())
+                .build();
     }
 }
