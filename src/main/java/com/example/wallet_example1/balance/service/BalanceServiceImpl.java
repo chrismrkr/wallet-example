@@ -40,7 +40,7 @@ public class BalanceServiceImpl implements BalanceService {
     @PostConstruct
     void setBalanceEventHandler() {
         if(balanceEventSubscriber instanceof DefaultBalanceEventSubscriber) {
-            ((DefaultBalanceEventSubscriber) balanceEventSubscriber).setBalanceDecreaseEventHandler(
+            ((DefaultBalanceEventSubscriber) balanceEventSubscriber).setBalanceDecreaseEventHandler (
                     balanceEvent -> {
                         Long eventId = balanceEvent.getEventId();
                         Optional<BalanceEventOutbox> byEventId = balanceEventOutboxRepository.findByEventId(eventId);
@@ -89,7 +89,7 @@ public class BalanceServiceImpl implements BalanceService {
 
                         Optional<BalanceEventOutbox> byEventId = balanceEventOutboxRepository.findByEventId(balanceEvent.getEventId());
                         if(byEventId.isEmpty()) {
-                            throw new IllegalArgumentException("Invalid Event Occur");
+                            throw new IllegalArgumentException("Invalid Event Occurred");
                         }
                         BalanceEventOutbox balanceEventOutbox = byEventId.get();
                         balanceEventOutbox.changeStatus(BalanceEventStatus.SUCCESS);
