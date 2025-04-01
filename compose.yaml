@@ -1,0 +1,91 @@
+services:
+  payment-example-nginx:
+    image: nginx:latest
+    container_name: payment-example-nginx
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - wallet-was1
+      - wallet-was2
+
+  wallet-was1:
+    image: wallet-example:latest
+    container_name: wallet-was1
+    ports:
+      - "8080"
+    environment:
+      SPRING_APPLICATION_NAME: wallet-was1
+    depends_on:
+      - wallet-db-shard1
+      - wallet-db-shard2
+      - wallet-db-shard3
+      - wallet-kafka
+    restart: always
+
+  wallet-was2:
+    image: wallet-example:latest
+    container_name: wallet-was2
+    ports:
+      - "8080"
+    environment:
+      SPRING_APPLICATION_NAME: wallet-was2
+    depends_on:
+      - wallet-db-shard1
+      - wallet-db-shard2
+      - wallet-db-shard3
+      - wallet-kafka
+    restart: always
+
+  wallet-db-shard1:
+    image: mysql:latest
+    container_name: wallet-db-shard1
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=app
+
+  wallet-db-shard2:
+    image: mysql:latest
+    container_name: wallet-db-shard2
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=app
+
+  wallet-db-shard3:
+    image: mysql:latest
+    container_name: wallet-db-shard3
+    ports:
+      - "3309:3306"
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=app
+
+  wallet-zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: wallet-zookeeper
+    ports:
+      - "2181:2181"
+
+  wallet-kafka:
+    image: wurstmeister/kafka:latest
+    container_name: wallet-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: wallet-zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092  # Kafka 브로커가 대기할 인터페이스 설정
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://wallet-kafka:9092  # 외부 클라이언트가 접근할 Kafka 브로커 주소
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - wallet-zookeeper
+    restart: always
