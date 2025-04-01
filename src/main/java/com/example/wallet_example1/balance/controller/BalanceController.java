@@ -55,11 +55,10 @@ public class BalanceController {
         private Long senderId;
         private Long receiverId;
         @Builder
-        private BalanceTransferReqDto(Long eventId, String senderBalanceId, String receiverBalanceId, BalanceOperation balanceOperation, String amount, Long senderId, Long receiverId) {
+        private BalanceTransferReqDto(Long eventId, String senderBalanceId, String receiverBalanceId, String amount, Long senderId, Long receiverId) {
             this.eventId = eventId;
             this.senderBalanceId = senderBalanceId;
             this.receiverBalanceId = receiverBalanceId;
-            this.balanceOperation = balanceOperation;
             this.amount = amount;
             this.senderId = senderId;
             this.receiverId = receiverId;
