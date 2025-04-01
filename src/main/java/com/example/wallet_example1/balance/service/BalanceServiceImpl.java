@@ -82,16 +82,21 @@ public class BalanceServiceImpl implements BalanceService {
 
             ((DefaultBalanceEventSubscriber) balanceEventSubscriber).setBalanceIncreaseEventHandler(
                     balanceEvent -> {
+                        Optional<BalanceEventOutbox> byEventId = balanceEventOutboxRepository.findByEventId(balanceEvent.getEventId());
+                        if(byEventId.isEmpty()) {
+                            throw new IllegalArgumentException("Invalid Event Occurred");
+                        }
+
+                        BalanceEventOutbox balanceEventOutbox = byEventId.get();
+                        if(balanceEventOutbox.getStatus().equals(BalanceEventStatus.SUCCESS)) {
+                            return;
+                        }
+
                         Long balanceId = Long.parseLong(balanceEvent.getReceiverBalanceId());
                         Balance balance = balanceRepository.findByBalanceId(balanceId);
                         balance.addAmount(balanceEvent.getAmount());
                         balanceRepository.save(balanceId, balance);
 
-                        Optional<BalanceEventOutbox> byEventId = balanceEventOutboxRepository.findByEventId(balanceEvent.getEventId());
-                        if(byEventId.isEmpty()) {
-                            throw new IllegalArgumentException("Invalid Event Occurred");
-                        }
-                        BalanceEventOutbox balanceEventOutbox = byEventId.get();
                         balanceEventOutbox.changeStatus(BalanceEventStatus.SUCCESS);
                         balanceEventOutboxRepository.save(balanceEventOutbox.getEventId(), balanceEventOutbox);
                     });

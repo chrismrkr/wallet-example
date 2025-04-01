@@ -19,7 +19,6 @@ public class DefaultBalanceEventSubscriber extends AbstractBalanceEventSubscribe
     @Override
     @Transactional
     public void doTransaction(BalanceEvent balanceEvent) {
-        log.info("do Transaction");
         switch (balanceEvent.getBalanceOperation()) {
             case SUBTRACT -> {
                 balanceDecreaseEventHandler.handle(balanceEvent);
@@ -27,18 +26,17 @@ public class DefaultBalanceEventSubscriber extends AbstractBalanceEventSubscribe
             case ADD -> {
                 balanceIncreaseEventHandler.handle(balanceEvent);
             }
-            default -> throw new IllegalArgumentException("Not Supported Balance");
+            default -> throw new IllegalArgumentException("Not Supported Balance Operation");
         }
     }
 
     @Override
     @Transactional
     public void doNextTransaction(BalanceEvent balanceEvent) {
-        log.info("do Next Transaction");
         switch (balanceEvent.getBalanceOperation()) {
             case SUBTRACT -> balanceDecreaseEventPostHandler.handle(balanceEvent);
             case ADD -> balanceIncreaseEventPostHandler.handle(balanceEvent);
-            default -> throw new IllegalArgumentException("Not Supported Balance");
+            default -> throw new IllegalArgumentException("Not Supported Balance Operation");
         }
     }
 }

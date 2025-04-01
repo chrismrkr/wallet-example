@@ -12,6 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 @SpringBootTest
 public class BalanceTransferServiceTest {
     @Autowired
@@ -55,6 +62,67 @@ public class BalanceTransferServiceTest {
             balanceRepository.deleteByBalanceId(balanceId1);
             balanceRepository.deleteByBalanceId(balanceId2);
             balanceEventOutboxRepository.delete(eventId);
+        }
+    }
+
+    @Test
+    void 다건_전자지갑_이체() {
+        Long balanceId1 = 0L;
+        Long balanceId2 = 1L;
+        Long balanceId3 = 2L;
+        List<Long> eventIdList = new ArrayList<>();
+        try {
+            // given
+            int transferCount = 5;
+            balanceService.initializeBalance(balanceId1, balanceId1, "10000");
+            balanceService.initializeBalance(balanceId2, balanceId2, "20000");
+            balanceService.initializeBalance(balanceId3, balanceId3, "30000");
+            ExecutorService executorService = Executors.newFixedThreadPool(transferCount);
+            CountDownLatch latch = new CountDownLatch(transferCount);
+
+            // when
+            for(long i=0; i<transferCount; i++) {
+                long finalI = i;
+                executorService.execute(() -> {
+
+                   Long senderBalanceId = finalI % 3;
+                   Long receiverBalanceId = (finalI + 1) % 3;
+                   Long eventId = finalI + (1234L);
+                   Long amount = 1000 * (finalI+1);
+                   eventIdList.add(eventId);
+                   BalanceEvent balanceEvent = BalanceEvent.builder()
+                            .eventId(eventId)
+                            .senderBalanceId(senderBalanceId.toString())
+                            .receiverBalanceId(receiverBalanceId.toString())
+                            .balanceOperation(BalanceOperation.SUBTRACT)
+                            .amount(amount.toString())
+                            .senderId(senderBalanceId)
+                            .receiverId(receiverBalanceId)
+                            .build();
+                   balanceService.publishBalanceEvent(balanceEvent);
+
+                   latch.countDown();
+               });
+            }
+            latch.await(5L, TimeUnit.SECONDS);
+            Thread.sleep(5000L);
+
+            // then
+            Balance balance1 = balanceRepository.findByBalanceId(balanceId1);
+            Balance balance2 = balanceRepository.findByBalanceId(balanceId2);
+            Balance balance3 = balanceRepository.findByBalanceId(balanceId3);
+            Assertions.assertEquals("8000", balance1.getAmount());
+            Assertions.assertEquals("18000", balance2.getAmount());
+            Assertions.assertEquals("34000", balance3.getAmount());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            balanceRepository.deleteByBalanceId(balanceId1);
+            balanceRepository.deleteByBalanceId(balanceId2);
+            balanceRepository.deleteByBalanceId(balanceId3);
+            for(Long eventId : eventIdList) {
+                balanceEventOutboxRepository.delete(eventId);
+            }
         }
     }
 
