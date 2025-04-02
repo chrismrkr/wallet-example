@@ -17,6 +17,11 @@ services:
       - "8080"
     environment:
       SPRING_APPLICATION_NAME: wallet-was1
+      SPRING_DATASOURCE_URL: jdbc:mysql://wallet-db-shard1:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD1_URL: jdbc:mysql://wallet-db-shard1:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD2_URL: jdbc:mysql://wallet-db-shard2:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD3_URL: jdbc:mysql://wallet-db-shard3:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: wallet-kafka:9092
     depends_on:
       - wallet-db-shard1
       - wallet-db-shard2
@@ -31,6 +36,11 @@ services:
       - "8080"
     environment:
       SPRING_APPLICATION_NAME: wallet-was2
+      SPRING_DATASOURCE_URL: jdbc:mysql://wallet-db-shard1:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD1_URL: jdbc:mysql://wallet-db-shard1:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD2_URL: jdbc:mysql://wallet-db-shard2:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_SHARD3_URL: jdbc:mysql://wallet-db-shard3:3306/app?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_KAFKA_BOOTSTRAP-SERVERS: wallet-kafka:9092
     depends_on:
       - wallet-db-shard1
       - wallet-db-shard2
