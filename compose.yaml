@@ -57,6 +57,8 @@ services:
       - MYSQL_ROOT_USER=root
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=app
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
 
   wallet-db-shard2:
     image: mysql:latest
@@ -67,6 +69,8 @@ services:
       - MYSQL_ROOT_USER=root
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=app
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
 
   wallet-db-shard3:
     image: mysql:latest
@@ -77,6 +81,8 @@ services:
       - MYSQL_ROOT_USER=root
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=app
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
 
   wallet-zookeeper:
     image: wurstmeister/zookeeper:latest
