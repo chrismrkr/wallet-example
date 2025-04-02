@@ -1,5 +1,5 @@
 services:
-  payment-example-nginx:
+  wallet-nginx:
     image: nginx:latest
     container_name: payment-example-nginx
     volumes:
