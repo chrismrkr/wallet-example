@@ -21,6 +21,7 @@ public class BalanceController {
             balanceService.initializeBalance(dto.getBalanceId(), dto.getMemberId(), dto.getAmount());
             return "ok";
         } catch (Exception e) {
+            log.info(e.getMessage());
             return "not ok";
         }
     }

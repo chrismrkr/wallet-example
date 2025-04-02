@@ -1,7 +1,7 @@
 services:
   wallet-nginx:
     image: nginx:latest
-    container_name: payment-example-nginx
+    container_name: wallet-nginx
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf
     ports:
